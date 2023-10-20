@@ -1,0 +1,7 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">AMLR</string>
+    <string name="bienvenido">¡Bienvenido!</string>
+    <string name="iniciar_sesion" tools:ignore="ExtraTranslation">Iniciar sesión</string>
+    <string name="forget"><u>Olvidé mi contraseña</u></string>
+    <string name="subrayado"><u>Cerrar sesión</u></string>
+</resources>
