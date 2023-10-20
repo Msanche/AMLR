@@ -69,6 +69,16 @@ public class Menu extends AppCompatActivity {
             }
         });
 
+        open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Menu.this,abrir_cerradura.class);
+                intent.putExtra("usuario",usuario);
+                intent.putExtra("pass",pass);
+                startActivity(intent);
+            }
+        });
+
     }
 
     /**
