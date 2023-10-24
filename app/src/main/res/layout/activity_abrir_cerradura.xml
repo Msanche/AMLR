@@ -55,21 +55,6 @@
             android:layout_weight="0" />
 
         <EditText
-            android:id="@+id/Number3"
-            android:layout_width="60dp"
-            android:layout_height="70dp"
-            android:background="@drawable/corner"
-            android:backgroundTint="#BDBCBC"
-            android:ems="10"
-            android:inputType="number"
-            tools:ignore="SpeakableTextPresentCheck" />
-
-        <Space
-            android:layout_width="15dp"
-            android:layout_height="70dp"
-            android:layout_weight="0" />
-
-        <EditText
             android:id="@+id/Number1"
             android:layout_width="60dp"
             android:layout_height="70dp"
@@ -77,6 +62,8 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
+            android:nextFocusDown="@id/Number2"
+            android:nextFocusRight="@id/Number2"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <Space
@@ -92,6 +79,29 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
+            android:nextFocusDown="@id/Number3"
+            android:nextFocusLeft="@id/Number1"
+            android:nextFocusRight="@id/Number3"
+            android:nextFocusUp="@id/Number1"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <Space
+            android:layout_width="15dp"
+            android:layout_height="70dp"
+            android:layout_weight="0" />
+
+        <EditText
+            android:id="@+id/Number3"
+            android:layout_width="60dp"
+            android:layout_height="70dp"
+            android:background="@drawable/corner"
+            android:backgroundTint="#BDBCBC"
+            android:ems="10"
+            android:inputType="number"
+            android:nextFocusDown="@id/Number4"
+            android:nextFocusLeft="@id/Number2"
+            android:nextFocusRight="@id/Number4"
+            android:nextFocusUp="@id/Number2"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <Space
@@ -107,6 +117,8 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
+            android:nextFocusLeft="@id/Number3"
+            android:nextFocusUp="@id/Number3"
             tools:ignore="SpeakableTextPresentCheck" />
         <Space
             android:layout_width="60dp"
@@ -350,7 +362,9 @@
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_weight="0"
-            android:background="@drawable/backspace_24"/>
+            android:background="@drawable/backspace_24"
+            android:backgroundTint="@color/gris"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Space
             android:layout_width="60dp"
