@@ -157,7 +157,7 @@ public class CambiarPin extends AppCompatActivity {
                                 }
 
                             } else {
-                                // Muestra un mensaje si las contraseñas ingresadas no son iguales
+                                // Muestra un mensaje si las contraseñas ingresadas no son iguales.
                                 Toast.makeText(CambiarPin.this, "LOS CAMPOS \"NUEVO PIN\" Y \"CONFIRMA TU PIN\" NO SON IGUALES", Toast.LENGTH_LONG).show();
                             }
                         }else{
