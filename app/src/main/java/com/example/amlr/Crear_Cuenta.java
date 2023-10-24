@@ -124,31 +124,35 @@ public class Crear_Cuenta extends AppCompatActivity {
                     }else{
                         // Comprobar si el correo es válido
                         if (valmail(mail)){
-                            DbHelper dbHelper = new DbHelper(Crear_Cuenta.this,"Cerradura.db",null,6);
-                            SQLiteDatabase db = dbHelper.getWritableDatabase();
-                            if (db != null) {
-                                // Mostrar mensaje si la base de datos se creó correctamente
-                                Toast.makeText(Crear_Cuenta.this, "BASE DE DATOS CREADA", Toast.LENGTH_LONG).show();
-                            } else {
-                                // Mostrar mensaje si hubo un error al crear la base de datos
-                                Toast.makeText(Crear_Cuenta.this, "ERROR AL CREAR LA BASE DE DATOS", Toast.LENGTH_LONG).show();
-                            }
-                            ContentValues datosUsuario = new ContentValues();
-                            datosUsuario.put("nombre", name);
-                            datosUsuario.put("correo",correo);
-                            datosUsuario.put("password",password);
-                            datosUsuario.put("passwordC",passwordC);
-                            try {
-                                // Insertar los datos del usuario en la base de datos
-                                helper.getWritableDatabase().insert("t_usuarios",null,datosUsuario);
-                                helper.getWritableDatabase().close();
-                                // Mostrar mensaje de éxito y redirigir a la actividad principal
-                                Toast.makeText(Crear_Cuenta.this, "Usuario creado con exito", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(Crear_Cuenta.this,MainActivity.class);
-                                startActivity(intent);
-                            }catch (Exception e){
-                                // Manejar posibles excepciones y mostrar un mensaje de error
-                                Toast.makeText(Crear_Cuenta.this, "Error"+ e.toString(), Toast.LENGTH_SHORT).show();
+                            if(passwordC.length()==4) {
+                                DbHelper dbHelper = new DbHelper(Crear_Cuenta.this, "Cerradura.db", null, 6);
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                if (db != null) {
+                                    // Mostrar mensaje si la base de datos se creó correctamente
+                                    Toast.makeText(Crear_Cuenta.this, "BASE DE DATOS CREADA", Toast.LENGTH_LONG).show();
+                                } else {
+                                    // Mostrar mensaje si hubo un error al crear la base de datos
+                                    Toast.makeText(Crear_Cuenta.this, "ERROR AL CREAR LA BASE DE DATOS", Toast.LENGTH_LONG).show();
+                                }
+                                ContentValues datosUsuario = new ContentValues();
+                                datosUsuario.put("nombre", name);
+                                datosUsuario.put("correo", correo);
+                                datosUsuario.put("password", password);
+                                datosUsuario.put("passwordC", passwordC);
+                                try {
+                                    // Insertar los datos del usuario en la base de datos
+                                    helper.getWritableDatabase().insert("t_usuarios", null, datosUsuario);
+                                    helper.getWritableDatabase().close();
+                                    // Mostrar mensaje de éxito y redirigir a la actividad principal
+                                    Toast.makeText(Crear_Cuenta.this, "Usuario creado con exito", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(Crear_Cuenta.this, MainActivity.class);
+                                    startActivity(intent);
+                                } catch (Exception e) {
+                                    // Manejar posibles excepciones y mostrar un mensaje de error
+                                    Toast.makeText(Crear_Cuenta.this, "Error" + e.toString(), Toast.LENGTH_SHORT).show();
+                                }
+                            }else{
+                                Toast.makeText(Crear_Cuenta.this, "EL PIN DEBE TENER 4 DIGITOS", Toast.LENGTH_SHORT).show();
                             }
                         }
                 }

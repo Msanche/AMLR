@@ -3,10 +3,7 @@ package com.example.amlr;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.text.InputFilter;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MotionEvent;
@@ -18,26 +15,21 @@ import android.widget.Toast;
 
 import com.example.amlr.db.DbHelper;
 
-/**
- * Esta clase representa la actividad para cambiar la contraseña del usuario.
- */
-public class change_password extends AppCompatActivity {
+public class CambiarPin extends AppCompatActivity {
 
     EditText actualPassword,newPassword,confirmPassword;
 
     Button continuar,cancelar;
 
-    ImageButton back;
+    ImageButton backs;
 
     boolean passVisible;
 
     String usuario,pass,cpass;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_change_password);
-
+        setContentView(R.layout.activity_cambiar_pin);
         // Recibe los datos de la actividad anterior
         recibirDatos();
 
@@ -47,7 +39,7 @@ public class change_password extends AppCompatActivity {
         confirmPassword = findViewById(R.id.confim_password);
         continuar = findViewById(R.id.ContinuarRP);
         cancelar = findViewById(R.id.CancelarRP);
-        back = findViewById(R.id.back);
+        backs = findViewById(R.id.back);
 
         // Acción para mostrar/ocultar contraseña al tocar el icono del ojo en el campo "Contraseña Actual"
         actualPassword.setOnTouchListener(new View.OnTouchListener() {
@@ -135,18 +127,6 @@ public class change_password extends AppCompatActivity {
             }
         });
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(change_password.this, Menu.class);
-                // Envia los atributos usuario y pass a la activity Menu
-                intent.putExtra("usuario", usuario);
-                intent.putExtra("pass", cpass);
-                startActivity(intent);
-                finish();
-            }
-        });
-
 
         // Acción al hacer clic en "Continuar"
         continuar.setOnClickListener(new View.OnClickListener() {
@@ -157,36 +137,41 @@ public class change_password extends AppCompatActivity {
                     String npass=newPassword.getText().toString();
                     cpass=confirmPassword.getText().toString();
                     if (!npass.isEmpty()||!cpass.isEmpty() ) {
-                        if (npass.equals(cpass)) {
-                            try {
-                                // Inicializa una instancia de DbHelper para manejar la base de datos
-                                DbHelper dbHelper = new DbHelper(change_password.this,"Cerradura.db",null,6);
-                                if (dbHelper.changePassword(usuario,cpass)) {
-                                    // Si el cambio de contraseña es exitoso, muestra un mensaje y redirige al menú
-                                    Toast.makeText(change_password.this, "Contraseña actualizada con exito", Toast.LENGTH_LONG).show();
-                                    Intent intent = new Intent(change_password.this, Menu.class);
-                                    intent.putExtra("correo", usuario);
-                                    intent.putExtra("pass", cpass);
-                                    startActivity(intent);
-                                    finish();
+                        if(npass.length()==4) {
+                            if (npass.equals(cpass)) {
+                                try {
+                                    // Inicializa una instancia de DbHelper para manejar la base de datos
+                                    DbHelper dbHelper = new DbHelper(CambiarPin.this, "Cerradura.db", null, 6);
+                                    if (dbHelper.changePIN(usuario, npass)) {
+                                        // Si el cambio de contraseña es exitoso, muestra un mensaje y redirige al menú
+                                        Toast.makeText(CambiarPin.this, "PIN actualizado con exito", Toast.LENGTH_LONG).show();
+                                        Intent intent = new Intent(CambiarPin.this, Menu.class);
+                                        intent.putExtra("correo", usuario);
+                                        intent.putExtra("pass", cpass);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                } catch (Exception e) {
+                                    // Maneja posibles excepciones mostrando un mensaje de error
+                                    Toast.makeText(CambiarPin.this, "" + e, Toast.LENGTH_LONG).show();
                                 }
-                            }catch (Exception e){
-                                // Maneja posibles excepciones mostrando un mensaje de error
-                                Toast.makeText(change_password.this, ""+e, Toast.LENGTH_LONG).show();
-                            }
 
-                        } else {
-                            // Muestra un mensaje si las contraseñas ingresadas no son iguales
-                            Toast.makeText(change_password.this, "LOS CAMPOS \"NUEVA CONTRASEÑA\" Y \"CONFIRMA TU CONTRASEÑA\" NO SON IGUALES", Toast.LENGTH_LONG).show();
+                            } else {
+                                // Muestra un mensaje si las contraseñas ingresadas no son iguales
+                                Toast.makeText(CambiarPin.this, "LOS CAMPOS \"NUEVO PIN\" Y \"CONFIRMA TU PIN\" NO SON IGUALES", Toast.LENGTH_LONG).show();
+                            }
+                        }else{
+                            //Muestra un mensaje si el PIN es diferente a 4 digitos
+                            Toast.makeText(CambiarPin.this,"INTRODUCE UN PIN DE 4 DIGITOS", Toast.LENGTH_LONG).show();
                         }
                     }else{
                         // Muestra un mensaje si se dejan campos vacíos
-                        Toast.makeText(change_password.this, "NO DEJES CAMPOS VACIOS", Toast.LENGTH_LONG).show();
+                        Toast.makeText(CambiarPin.this, "NO DEJES CAMPOS VACIOS", Toast.LENGTH_LONG).show();
                     }
 
                 }else{
                     // Muestra un mensaje si la contraseña actual es incorrecta
-                    Toast.makeText(change_password.this, "CONTRASEÑA INCORRECTA", Toast.LENGTH_LONG).show();
+                    Toast.makeText(CambiarPin.this, "CONTRASEÑA INCORRECTA", Toast.LENGTH_LONG).show();
 
                 }
             }
@@ -197,8 +182,20 @@ public class change_password extends AppCompatActivity {
         cancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(change_password.this, Menu.class);
-        // Envia los atributos usuario y pass a la activity Menu
+                Intent intent = new Intent(CambiarPin.this, Menu.class);
+                // Envia los atributos usuario y pass a la activity Menu
+                intent.putExtra("usuario", usuario);
+                intent.putExtra("pass", cpass);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        backs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(CambiarPin.this, Menu.class);
+                // Envia los atributos usuario y pass a la activity Menu
                 intent.putExtra("usuario", usuario);
                 intent.putExtra("pass", cpass);
                 startActivity(intent);
@@ -213,10 +210,10 @@ public class change_password extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             assert extras != null;
             usuario = extras.getString("usuario");
-             pass = extras.getString("pass");
+            pass = extras.getString("pass");
         } catch (Exception e) {
             // Maneja posibles excepciones mostrando un mensaje de error
-            Toast.makeText(change_password.this, "" + e, Toast.LENGTH_LONG).show();
+            Toast.makeText(CambiarPin.this, "" + e, Toast.LENGTH_LONG).show();
 
         }
     }

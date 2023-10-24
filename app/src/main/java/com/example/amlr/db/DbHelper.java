@@ -126,4 +126,29 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
+    public boolean changePIN(String user, String password){
+        boolean correcto = false;
+
+        // Se crea un objeto DbHelper para acceder a la base de datos.
+
+        DbHelper helper = new DbHelper(context,"Cerradura.db",null,6);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        try {
+            // Se ejecuta una sentencia SQL para actualizar la contraseña del usuario.
+            db.execSQL("UPDATE " + TABLE_USUARIOS + " SET passwordC = '" + password + "' WHERE nombre = '" + user + "' ");
+            correcto = true;
+        }catch (Exception e){
+            // En caso de error, se muestra un mensaje de error.
+            e.toString();
+            Toast.makeText(context, "db"+e, Toast.LENGTH_LONG).show();
+            correcto = false;
+        }finally {
+            // Se cierra la base de datos.
+            db.close();
+        }
+
+        return correcto;
+    }
+
 }

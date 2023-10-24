@@ -113,7 +113,7 @@
         android:drawableEnd="@drawable/eye_off"
         android:drawablePadding="12dp"
         android:ems="10"
-        android:hint="PIN para la cerradura"
+        android:hint="PIN de 4 digitos"
         android:inputType="numberPassword"
         android:longClickable="false"
         android:maxLength="4"

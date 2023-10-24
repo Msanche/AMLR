@@ -4,11 +4,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -18,9 +20,12 @@ import android.widget.TextView;
  */
 public class registro_act extends AppCompatActivity {
 
+    ImageButton back;
     private ScrollView scrollView;
     private LinearLayout linearLayout;
     private int lastScrollY = 0;
+
+    String usuario,cpass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,7 @@ public class registro_act extends AppCompatActivity {
         // Inicialización de elementos de la interfaz
         LinearLayout linearLayout = findViewById(R.id.linear_layout);
         scrollView  = findViewById(R.id.scroll_view);
+        back = findViewById(R.id.back);
 
         for (int i = 1; i <= 16; i++) {
             // Crea un CardView (rectángulo) para representar la información
@@ -66,6 +72,18 @@ public class registro_act extends AppCompatActivity {
                         }
                     }
                     lastScrollY = scrollY;
+                }
+            });
+
+            back.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(registro_act.this, Menu.class);
+                    // Envia los atributos usuario y pass a la activity Menu
+                    intent.putExtra("usuario", usuario);
+                    intent.putExtra("pass", cpass);
+                    startActivity(intent);
+                    finish();
                 }
             });
         }
