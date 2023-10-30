@@ -34,6 +34,14 @@ public class Menu extends AppCompatActivity {
 
     String usuario, pass;
 
+    BluetoothAdapter bluetoothAdapter;
+    BluetoothDevice hc05Device;
+    BluetoothSocket bluetoothSocket;
+    OutputStream outputStream;
+    InputStream inputStream;
+
+    // UUID para el perfil SPP (Serial Port Profile)
+    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +58,32 @@ public class Menu extends AppCompatActivity {
 
         // Recibe los datos de usuario y contraseña
         recibirDatos();
+
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        try {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+            if (bluetoothAdapter == null) {
+                Toast.makeText(this, "Bluetooth no está disponible en este dispositivo", Toast.LENGTH_SHORT).show();
+            } else {
+                // Verificar si Bluetooth está habilitado y habilitarlo si es necesario
+                if (!bluetoothAdapter.isEnabled()) {
+                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                    startActivityForResult(enableBtIntent, 1);
+                }
+            }
+            // Establecer la conexión Bluetooth con el dispositivo HC-05
+            conectarHC05();
+        } else {
+            // No tienes los permisos necesarios, debes solicitarlos al usuario
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH}, 1);
+        }
+        } catch (Exception e) {
+            // Manejar errores de conexión
+            Toast.makeText(this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
 
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +148,15 @@ public class Menu extends AppCompatActivity {
             }
         });
 
+        open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Menu.this,abrir_cerradura.class);
+                intent.putExtra("usuario",usuario);
+                intent.putExtra("pass",pass);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -145,6 +188,35 @@ public class Menu extends AppCompatActivity {
         }
     }
 
+    // Método para establecer la conexión Bluetooth con el HC-05
+    private void conectarHC05() {
+        try {
+            hc05Device = bluetoothAdapter.getRemoteDevice("98:D3:33:80:B4:69"); // Reemplaza con la dirección MAC de tu HC-05
+        } catch (Exception e) {
+            // Manejar errores de conexión
+            Toast.makeText(this, "Error de conexión Bluetooth: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        try {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            bluetoothSocket = hc05Device.createRfcommSocketToServiceRecord(uuid);
+            bluetoothSocket.connect();
+            outputStream = bluetoothSocket.getOutputStream();
+            inputStream = bluetoothSocket.getInputStream();
+        } catch (IOException e) {
+            // Manejar errores de conexión
+            Toast.makeText(this, "Error de conexión Bluetooth: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     /**
