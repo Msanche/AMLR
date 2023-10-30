@@ -1,6 +1,7 @@
 package com.example.amlr.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.widget.Toast;
@@ -150,5 +151,43 @@ public class DbHelper extends SQLiteOpenHelper {
 
         return correcto;
     }
+
+    public boolean validarUsuario(String usuario, String pass) {
+        // Crea una instancia de tu DbHelper
+        DbHelper dbHelper = new DbHelper(context, "Cerradura.db", null, 6);
+
+        // Obtén una instancia de la base de datos en modo lectura
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        // Define la proyección (las columnas que deseas recuperar)
+        String[] projection = {
+                "nombre",
+                "password"
+        };
+
+        // Filtra los resultados WHERE "nombre" = usuario AND "password" = pass
+        String selection = "nombre = ? AND password = ?";
+        String[] selectionArgs = {usuario, pass};
+
+        // Realiza la consulta
+        Cursor cursor = db.query(
+                "t_usuarios",     // Nombre de la tabla
+                projection,       // Columnas que deseas recuperar
+                selection,        // Cláusula WHERE
+                selectionArgs,    // Argumentos de la cláusula WHERE
+                null,             // GROUP BY
+                null,             // HAVING
+                null              // ORDER BY
+        );
+
+        boolean usuarioValido = cursor.moveToFirst(); // Devuelve true si se encontró un registro
+
+        // Cierra la conexión a la base de datos
+        cursor.close();
+        db.close();
+
+        return usuarioValido;
+    }
+
 
 }
