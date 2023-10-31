@@ -42,7 +42,7 @@ public class bluetooth_connection extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE); // Oculta la barra de progreso inicialmente
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
+    try {
         if (bluetoothAdapter == null) {
             // Tu dispositivo no admite Bluetooth
             Toast.makeText(this, "Bluetooth no está disponible en este dispositivo", Toast.LENGTH_LONG).show();
@@ -66,6 +66,10 @@ public class bluetooth_connection extends AppCompatActivity {
             // El permiso ya se concedió
             startBluetoothDiscovery();
         }
+    }catch(Exception e){
+        Toast.makeText(this, "Error:"+e, Toast.LENGTH_SHORT).show();
+    }
+
     }
 
     // Método para iniciar el descubrimiento de dispositivos Bluetooth
