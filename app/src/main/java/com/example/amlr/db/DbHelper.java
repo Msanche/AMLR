@@ -1,5 +1,6 @@
 package com.example.amlr.db;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -152,41 +153,23 @@ public class DbHelper extends SQLiteOpenHelper {
         return correcto;
     }
 
-    public boolean validarUsuario(String usuario, String pass) {
-        // Crea una instancia de tu DbHelper
-        DbHelper dbHelper = new DbHelper(context, "Cerradura.db", null, 6);
+    public boolean validarPIN(String usuario, String pin) {
+        boolean pinValido = false;
+        SQLiteDatabase db = this.getReadableDatabase();
 
-        // Obtén una instancia de la base de datos en modo lectura
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT passwordC FROM " + TABLE_USUARIOS + " WHERE nombre = ?", new String[]{usuario});
 
-        // Define la proyección (las columnas que deseas recuperar)
-        String[] projection = {
-                "nombre",
-                "password"
-        };
+        if (cursor.moveToFirst()) {
+            @SuppressLint("Range") String passwordC = cursor.getString(cursor.getColumnIndex("passwordC"));
+            if (pin.equals(passwordC)) {
+                pinValido = true;
+            }
+        }
 
-        // Filtra los resultados WHERE "nombre" = usuario AND "password" = pass
-        String selection = "nombre = ? AND password = ?";
-        String[] selectionArgs = {usuario, pass};
-
-        // Realiza la consulta
-        Cursor cursor = db.query(
-                "t_usuarios",     // Nombre de la tabla
-                projection,       // Columnas que deseas recuperar
-                selection,        // Cláusula WHERE
-                selectionArgs,    // Argumentos de la cláusula WHERE
-                null,             // GROUP BY
-                null,             // HAVING
-                null              // ORDER BY
-        );
-
-        boolean usuarioValido = cursor.moveToFirst(); // Devuelve true si se encontró un registro
-
-        // Cierra la conexión a la base de datos
         cursor.close();
         db.close();
 
-        return usuarioValido;
+        return pinValido;
     }
 
 

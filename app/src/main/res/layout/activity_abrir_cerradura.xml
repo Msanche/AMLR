@@ -62,8 +62,11 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
-            android:nextFocusDown="@id/Number2"
+            android:maxLength="1"
             android:nextFocusRight="@id/Number2"
+            android:nextFocusDown="@id/Number2"
+            android:textAlignment="center"
+            android:textSize="24sp"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <Space
@@ -79,10 +82,13 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
-            android:nextFocusDown="@id/Number3"
+            android:maxLength="1"
             android:nextFocusLeft="@id/Number1"
             android:nextFocusRight="@id/Number3"
             android:nextFocusUp="@id/Number1"
+            android:nextFocusDown="@id/Number3"
+            android:textAlignment="center"
+            android:textSize="24sp"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <Space
@@ -98,10 +104,13 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
-            android:nextFocusDown="@id/Number4"
+            android:maxLength="1"
             android:nextFocusLeft="@id/Number2"
             android:nextFocusRight="@id/Number4"
             android:nextFocusUp="@id/Number2"
+            android:nextFocusDown="@id/Number4"
+            android:textAlignment="center"
+            android:textSize="24sp"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <Space
@@ -117,8 +126,11 @@
             android:backgroundTint="#BDBCBC"
             android:ems="10"
             android:inputType="number"
+            android:maxLength="1"
             android:nextFocusLeft="@id/Number3"
             android:nextFocusUp="@id/Number3"
+            android:textAlignment="center"
+            android:textSize="24sp"
             tools:ignore="SpeakableTextPresentCheck" />
         <Space
             android:layout_width="60dp"
