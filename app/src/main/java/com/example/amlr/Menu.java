@@ -49,7 +49,7 @@ public class Menu extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         // Inicialización de elementos de la interfaz
-        boton = findViewById(R.id.boton);
+        boton = findViewById(R.id.blue);
         open = findViewById(R.id.abrirC);
         ver = findViewById(R.id.VerRegistro);
         change_pin = findViewById(R.id.CambiarPin);
@@ -161,7 +161,7 @@ public class Menu extends AppCompatActivity {
     }
 
     public void led(){
-        Intent intent = new Intent(Menu.this,ComunicacionBluetooth.class);
+        Intent intent = new Intent(Menu.this, bluetooth_connection.class);
         intent.putExtra("usuario",usuario);
         intent.putExtra("pass",pass);
         startActivity(intent);

@@ -22,9 +22,6 @@ public class registro_act extends AppCompatActivity {
 
     ImageButton back;
     private ScrollView scrollView;
-    private LinearLayout linearLayout;
-    private int lastScrollY = 0;
-
     String usuario,cpass;
 
     @Override
@@ -56,24 +53,6 @@ public class registro_act extends AppCompatActivity {
 
             // Agrega el CardView al LinearLayout
             linearLayout.addView(cardView);
-
-            cardView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                @Override
-                public void onScrollChanged() {
-                    int scrollY = scrollView.getScrollY();
-                    // Verifica si el desplazamiento es hacia abajo
-                    if (scrollY > lastScrollY) {
-                        // Disminuye el tamaño del CardView (ajusta según tus preferencias)
-                        int newHeight = cardView.getHeight() - 10; // Cambia 10 por el valor deseado
-                        if (newHeight > 0) {
-                            ViewGroup.LayoutParams params = cardView.getLayoutParams();
-                            params.height = newHeight;
-                            cardView.setLayoutParams(params);
-                        }
-                    }
-                    lastScrollY = scrollY;
-                }
-            });
 
             back.setOnClickListener(new View.OnClickListener() {
                 @Override

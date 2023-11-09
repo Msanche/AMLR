@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -25,6 +26,9 @@ public class bluetooth_connection extends AppCompatActivity {
     private ListView deviceListView;
     private ProgressBar progressBar;
 
+    ImageButton back;
+
+    String usuario,pass;
 
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
 
@@ -40,6 +44,9 @@ public class bluetooth_connection extends AppCompatActivity {
         deviceListView.setAdapter(deviceArrayAdapter);
         progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.INVISIBLE); // Oculta la barra de progreso inicialmente
+        back = findViewById(R.id.back_button);
+
+        recibirDatos();
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     try {
@@ -70,7 +77,19 @@ public class bluetooth_connection extends AppCompatActivity {
         Toast.makeText(this, "Error:"+e, Toast.LENGTH_SHORT).show();
     }
 
+    back.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(bluetooth_connection.this, Menu.class);
+            intent.putExtra("usuario", usuario);
+            intent.putExtra("pass", pass);
+            startActivity(intent);
+        }
+    });
+
     }
+
+
 
     // Método para iniciar el descubrimiento de dispositivos Bluetooth
     @SuppressLint("MissingPermission")
@@ -110,5 +129,18 @@ public class bluetooth_connection extends AppCompatActivity {
             bluetoothAdapter.cancelDiscovery();
         }
         unregisterReceiver(receiver);
+    }
+
+    private void recibirDatos(){
+        try {
+            Bundle extras = getIntent().getExtras();
+            usuario = extras.getString("usuario");
+            pass = extras.getString("pass");
+
+        }catch (Exception e){
+            Toast.makeText(bluetooth_connection.this, ""+e, Toast.LENGTH_LONG).show();
+
+        }
+
     }
 }

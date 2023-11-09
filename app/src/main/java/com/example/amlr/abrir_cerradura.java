@@ -30,7 +30,6 @@ public class abrir_cerradura extends AppCompatActivity {
     private BluetoothDevice hc05Device; // Agrega tu dispositivo HC-05 aquí
     private BluetoothSocket bluetoothSocket;
     private OutputStream outputStream;
-    private Button removeButton;
     private String usuario;
     private String pass;
 
@@ -41,6 +40,8 @@ public class abrir_cerradura extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abrir_cerradura);
+
+        recibirDatos(); // Asegúrate de haber definido el método recibirDatos para obtener usuario y pass.
 
         editTexts[0] = findViewById(R.id.Number1);
         editTexts[1] = findViewById(R.id.Number2);
@@ -130,12 +131,6 @@ public class abrir_cerradura extends AppCompatActivity {
             }
         });
 
-        removeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeNumber();
-            }
-        });
 
         back = findViewById(R.id.back_button);
 
@@ -150,7 +145,6 @@ public class abrir_cerradura extends AppCompatActivity {
             }
         });
 
-        recibirDatos(); // Asegúrate de haber definido el método recibirDatos para obtener usuario y pass.
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -167,10 +161,10 @@ public class abrir_cerradura extends AppCompatActivity {
                 // Bluetooth está habilitado, puedes continuar con la conexión al HC-05.
 
                 // Debes configurar hc05Device con la dirección MAC de tu HC-05.
-                hc05Device = bluetoothAdapter.getRemoteDevice("98:D3:33:80:B4:69");
 
-                // Luego puedes intentar establecer una conexión con el dispositivo HC-05.
                 try {
+                    hc05Device = bluetoothAdapter.getRemoteDevice("98:D3:33:80:B4:69");
+                    // Luego puedes intentar establecer una conexión con el dispositivo HC-05.
                     bluetoothSocket = hc05Device.createRfcommSocketToServiceRecord(MY_UUID);
                     bluetoothSocket.connect();
                     outputStream = bluetoothSocket.getOutputStream();
@@ -181,15 +175,7 @@ public class abrir_cerradura extends AppCompatActivity {
             }
         }
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(abrir_cerradura.this, Menu.class);
-                intent.putExtra("usuario", usuario);
-                intent.putExtra("pass", pass);
-                startActivity(intent);
-            }
-        });
+
 
         editTexts[3].setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -199,6 +185,16 @@ public class abrir_cerradura extends AppCompatActivity {
                     return true;
                 }
                 return false;
+            }
+        });
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(abrir_cerradura.this, Menu.class);
+                intent.putExtra("usuario", usuario);
+                intent.putExtra("pass", pass);
+                startActivity(intent);
             }
         });
     }
