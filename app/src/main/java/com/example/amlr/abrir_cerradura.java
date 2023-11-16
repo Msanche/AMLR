@@ -19,6 +19,9 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.io.InputStream;
+import android.os.Handler;
+
 
 import com.example.amlr.db.DbHelper;
 
@@ -51,7 +54,7 @@ public class abrir_cerradura extends AppCompatActivity {
         // Configura los Click Listeners para los botones numéricos
         Button buttonZero = findViewById(R.id.ButtonZero);
         Button removeButton = findViewById(R.id.Remove);
-
+        Button buttonDone = findViewById(R.id.buttonDone);
         buttonZero.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,38 +156,59 @@ public class abrir_cerradura extends AppCompatActivity {
             Toast.makeText(this, "El dispositivo no admite Bluetooth", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            if (!bluetoothAdapter.isEnabled()) {
-                // El Bluetooth está deshabilitado, solicita habilitarlo o maneja esto según tus necesidades.
-                Toast.makeText(this, "Habilita el Bluetooth para continuar", Toast.LENGTH_SHORT).show();
+            if (bluetoothAdapter == null) {
+                // El dispositivo no admite Bluetooth, maneja esto según tus necesidades.
+                Toast.makeText(this, "El dispositivo no admite Bluetooth", Toast.LENGTH_SHORT).show();
                 finish();
             } else {
-                // Bluetooth está habilitado, puedes continuar con la conexión al HC-05.
+                if (!bluetoothAdapter.isEnabled()) {
+                    // El Bluetooth está deshabilitado, solicita habilitarlo o maneja esto según tus necesidades.
+                    Toast.makeText(this, "Habilita el Bluetooth para continuar", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    // Bluetooth está habilitado, puedes continuar con la conexión al HC-05.
+                    if (bluetoothSocket == null || !bluetoothSocket.isConnected()) {
+                        // Intenta conectar solo si no hay una conexión Bluetooth activa
+                        try {
+                            hc05Device = bluetoothAdapter.getRemoteDevice("98:D3:33:80:B4:69");
+                            // Luego puedes intentar establecer una conexión con el dispositivo HC-05.
+                            bluetoothSocket = hc05Device.createRfcommSocketToServiceRecord(MY_UUID);
+                            bluetoothSocket.connect();
+                            outputStream = bluetoothSocket.getOutputStream();
 
-                // Debes configurar hc05Device con la dirección MAC de tu HC-05.
+                            // Obtener el InputStream del BluetoothSocket
+                            InputStream inputStream = bluetoothSocket.getInputStream();
 
-                try {
-                    hc05Device = bluetoothAdapter.getRemoteDevice("98:D3:33:80:B4:69");
-                    // Luego puedes intentar establecer una conexión con el dispositivo HC-05.
-                    bluetoothSocket = hc05Device.createRfcommSocketToServiceRecord(MY_UUID);
-                    bluetoothSocket.connect();
-                    outputStream = bluetoothSocket.getOutputStream();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, "Error al conectar con el HC-05", Toast.LENGTH_SHORT).show();
+                            // Configurar un tiempo de espera en milisegundos
+                            int timeout = 10000; // 10 segundos
+
+                            // Utilizar un Handler para imponer el límite de tiempo
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Este código se ejecutará después de 'timeout' milisegundos
+
+                                }
+                            }, timeout);
+
+                            // Continuar con la lectura de datos desde inputStream
+                            // ...
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(this, "Error al conectar con el HC-05" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
             }
         }
 
 
 
-        editTexts[3].setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        buttonDone.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    validarPIN(); // Llama a la función de validación cuando se ingrese el número en el cuarto EditText.
-                    return true;
-                }
-                return false;
+            public void onClick(View v) {
+                validarPIN();
             }
         });
 
@@ -237,6 +261,7 @@ public class abrir_cerradura extends AppCompatActivity {
         if (outputStream != null) {
             try {
                 outputStream.write("1".getBytes());
+                Toast.makeText(this, "Se envió", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Error al enviar datos por Bluetooth", Toast.LENGTH_SHORT).show();
@@ -247,6 +272,7 @@ public class abrir_cerradura extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // Mueve la desconexión Bluetooth aquí, para cerrar la conexión al salir de la actividad
         try {
             if (bluetoothSocket != null) {
                 bluetoothSocket.close();
@@ -266,13 +292,17 @@ public class abrir_cerradura extends AppCompatActivity {
 
         String enteredPIN = pinBuilder.toString();
 
+        Toast.makeText(this, "Entered PIN: " + enteredPIN, Toast.LENGTH_SHORT).show();  // Agrega este log para verificar el PIN introducido
+
         // Realiza la validación del PIN con el campo passwordC de la base de datos
         DbHelper dbHelper = new DbHelper(this, "Cerradura.db", null, 6);
         boolean pinValido = dbHelper.validarPIN(usuario, enteredPIN);
 
         if (pinValido) {
+            Toast.makeText(this, "PIN válido", Toast.LENGTH_SHORT).show(); // Agrega este log para verificar que el PIN es válido
             // El PIN ingresado es válido
             enviarUnoPorBluetooth(); // Enviar "1" por Bluetooth
+            Toast.makeText(this, "Se hizo el enviarUnoPorBluetooth", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "PIN incorrecto", Toast.LENGTH_SHORT).show();
         }
