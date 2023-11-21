@@ -1,7 +1,7 @@
 package com.example.amlr;
 
 import androidx.appcompat.app.AppCompatActivity;
-
+import com.example.amlr.RegistroListener;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -25,10 +25,16 @@ import android.os.Handler;
 
 import com.example.amlr.db.DbHelper;
 
-public class abrir_cerradura extends AppCompatActivity {
+public class abrir_cerradura extends AppCompatActivity implements RegistroListener{
 
     private EditText[] editTexts = new EditText[4]; // Array para almacenar los EditText
-
+    // Variable para la interfaz RegistroListener
+    private RegistroListener registroListener;
+    //PARA MANEJO DE BLOQUEOS
+    private int failedAttempts = 0;
+    private boolean isLocked = false;
+    private Handler handler = new Handler();
+    //TERMINA MANEJO DE BLOQUEOS
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothDevice hc05Device; // Agrega tu dispositivo HC-05 aquí
     private BluetoothSocket bluetoothSocket;
@@ -41,6 +47,8 @@ public class abrir_cerradura extends AppCompatActivity {
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Inicialización de registroListener
+        registroListener = this;  // Puedes asignar 'this' si la clase implementa la interfaz
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abrir_cerradura);
 
@@ -257,7 +265,7 @@ public class abrir_cerradura extends AppCompatActivity {
 
 
     // Agrega aquí la función para enviar "1" al HC-05 a través de Bluetooth.
-    private void enviarUnoPorBluetooth() {
+    /*private void enviarUnoPorBluetooth() {
         if (outputStream != null) {
             try {
                 outputStream.write("1".getBytes());
@@ -267,7 +275,15 @@ public class abrir_cerradura extends AppCompatActivity {
                 Toast.makeText(this, "Error al enviar datos por Bluetooth", Toast.LENGTH_SHORT).show();
             }
         }
+    }*/
+    private void enviarUnoPorBluetooth(int data) {
+        try {
+            outputStream.write(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
     @Override
     protected void onDestroy() {
@@ -283,6 +299,9 @@ public class abrir_cerradura extends AppCompatActivity {
         }
     }
     private void validarPIN() {
+        if (isLocked) {
+            return; // Si la cerradura está bloqueada, no valides el PIN.
+        }
         StringBuilder pinBuilder = new StringBuilder();
 
         // Construye el PIN a partir de los EditText
@@ -292,7 +311,7 @@ public class abrir_cerradura extends AppCompatActivity {
 
         String enteredPIN = pinBuilder.toString();
 
-        Toast.makeText(this, "Entered PIN: " + enteredPIN, Toast.LENGTH_SHORT).show();  // Agrega este log para verificar el PIN introducido
+        Toast.makeText(this, "PIN introducido: " + enteredPIN, Toast.LENGTH_SHORT).show();  // Agrega este log para verificar el PIN introducido
 
         // Realiza la validación del PIN con el campo passwordC de la base de datos
         DbHelper dbHelper = new DbHelper(this, "Cerradura.db", null, 6);
@@ -301,10 +320,70 @@ public class abrir_cerradura extends AppCompatActivity {
         if (pinValido) {
             Toast.makeText(this, "PIN válido", Toast.LENGTH_SHORT).show(); // Agrega este log para verificar que el PIN es válido
             // El PIN ingresado es válido
-            enviarUnoPorBluetooth(); // Enviar "1" por Bluetooth
+            enviarUnoPorBluetooth(1); // Enviar "1" por Bluetooth
             Toast.makeText(this, "Se hizo el enviarUnoPorBluetooth", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "PIN incorrecto", Toast.LENGTH_SHORT).show();
+            // Incrementa el contador de intentos fallidos
+            failedAttempts++;
+
+            if (failedAttempts >= 3) {
+                bloquearCerradura();
+            } else {
+                Toast.makeText(this, "PIN incorrecto. Intento " + failedAttempts + " de 3.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void bloquearCerradura() {
+        isLocked = true;
+        Toast.makeText(this, "La cerradura se bloqueará durante 30 segundos", Toast.LENGTH_SHORT).show();
+        // Llama al método de la interfaz para indicar el bloqueo
+        if (registroListener != null) {
+            registroListener.onBloqueoCerradura();
+        }
+        // Inicia un temporizador para desbloquear la cerradura después de 30 segundos
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                desbloquearCerradura();
+            }
+        }, 30000);
+    }
+
+    private void desbloquearCerradura() {
+        isLocked = false;
+        failedAttempts = 0;
+        Toast.makeText(this, "La cerradura se ha desbloqueado", Toast.LENGTH_SHORT).show();
+
+        // Llama al método de la interfaz para indicar la apertura
+        if (registroListener != null) {
+            registroListener.onAperturaCerradura();
+        }
+    }
+
+    @Override
+    public void onAperturaCerradura() {
+        // Implementación para cuando se abra la cerradura
+        // Puedes agregar código específico aquí si es necesario
+        notifyRegistroListener(true);
+    }
+
+    @Override
+    public void onBloqueoCerradura() {
+        // Implementación para cuando se bloquee la cerradura
+        // Puedes agregar código específico aquí si es necesario
+        notifyRegistroListener(false);
+    }
+
+    // Método para notificar a la actividad de registro
+    private void notifyRegistroListener(boolean aperturaExitosa) {
+        RegistroListener listener = (RegistroListener) this;
+        if (listener != null) {
+            if (aperturaExitosa) {
+                listener.onAperturaCerradura();
+            } else {
+                listener.onBloqueoCerradura();
+            }
         }
     }
 }
