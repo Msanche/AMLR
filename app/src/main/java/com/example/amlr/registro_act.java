@@ -48,7 +48,7 @@ public class registro_act extends AppCompatActivity implements RegistroListener{
         recibirDatos();
 
         // Agrega una actividad de ejemplo (puedes reemplazar esto con tus propias actividades)
-        agregarActividad("Se abrió la cerradura");
+        //agregarActividad("Se abrió la cerradura");
 
         // Cargar actividades existentes desde la base de datos
         cargarActividadesDesdeBD();
@@ -86,7 +86,7 @@ public class registro_act extends AppCompatActivity implements RegistroListener{
     // Método para cargar las actividades en la interfaz
     private void cargarActividades() {
         // Limpiar el LinearLayout antes de agregar las nuevas actividades
-        linearLayout.removeAllViews();
+        //linearLayout.removeAllViews();
 
         // Iterar sobre la lista de actividades y agregar CardViews
         for (String actividad : activityList) {

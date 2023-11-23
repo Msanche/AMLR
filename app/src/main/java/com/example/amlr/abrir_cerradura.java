@@ -179,6 +179,7 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
                         // Intenta conectar solo si no hay una conexión Bluetooth activa
                         try {
                             hc05Device = bluetoothAdapter.getRemoteDevice("98:D3:33:80:B4:69");
+                            //hc05Device = bluetoothAdapter.getRemoteDevice("20:16:07:25:19:87");
                             // Luego puedes intentar establecer una conexión con el dispositivo HC-05.
                             bluetoothSocket = hc05Device.createRfcommSocketToServiceRecord(MY_UUID);
                             bluetoothSocket.connect();
@@ -276,7 +277,9 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
             }
         }
     }*/
-    private void enviarUnoPorBluetooth(int data) {
+
+    //*******************************************************************************************************************************************************
+    private void enviarUnoPorBluetooth(char data) {
         try {
             outputStream.write(data);
         } catch (IOException e) {
@@ -320,7 +323,8 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
         if (pinValido) {
             Toast.makeText(this, "PIN válido", Toast.LENGTH_SHORT).show(); // Agrega este log para verificar que el PIN es válido
             // El PIN ingresado es válido
-            enviarUnoPorBluetooth(1); // Enviar "1" por Bluetooth
+            //**********************************************************************************************************************************************
+            enviarUnoPorBluetooth('1'); // Enviar "1" por Bluetooth
             Toast.makeText(this, "Se hizo el enviarUnoPorBluetooth", Toast.LENGTH_SHORT).show();
         } else {
             // Incrementa el contador de intentos fallidos
