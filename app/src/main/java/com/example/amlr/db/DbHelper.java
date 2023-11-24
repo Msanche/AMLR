@@ -11,7 +11,9 @@ import androidx.annotation.Nullable;
 
 import com.example.amlr.Restablecer_password;
 import com.example.amlr.change_password;
+import com.example.amlr.entidades.Actividades;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 public class DbHelper extends SQLiteOpenHelper {
@@ -40,18 +42,22 @@ public class DbHelper extends SQLiteOpenHelper {
             "password TEXT NOT NULL," +
             "passwordC TEXT NOT NULL)");
 
-    sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_REGISTRO + "(" +
+    /*sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_REGISTRO + "(" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "nombre_us TEXT NOT NULL," +
             "intentos_f INTEGER NOT NULL," +
             "acciones TEXT NOT NULL," +
             "fecha_y_hora TEXT NOT NULL)");
+    }*/
+        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_REGISTRO + "(" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "accion TEXT NOT NULL," +
+                "fecha_y_hora TEXT NOT NULL)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
     sqLiteDatabase.execSQL("DROP TABLE " + TABLE_USUARIOS);
-    sqLiteDatabase.execSQL("DROP TABLE " + TABLE_REGISTRO);
     onCreate(sqLiteDatabase);
     }
 
@@ -170,6 +176,31 @@ public class DbHelper extends SQLiteOpenHelper {
         db.close();
 
         return pinValido;
+    }
+
+    public ArrayList<Actividades> mostrarAcciones(){
+        DbHelper helper = new DbHelper(context,"Cerradura.db",null,6);
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        ArrayList<Actividades> listaActividades = new ArrayList<>();
+        Actividades actividad = null;
+        Cursor cursorActividades = null;
+
+        cursorActividades = db.rawQuery("SELECT * FROM " + TABLE_REGISTRO, null);
+
+        if(cursorActividades.moveToFirst()){
+            do{
+                actividad = new Actividades();
+                actividad.setId(cursorActividades.getInt(0));
+                actividad.setAccion(cursorActividades.getString(1));
+                actividad.setFecha_y_hora(cursorActividades.getString(2));
+                listaActividades.add(actividad);
+            }while(cursorActividades.moveToNext());
+        }
+
+        cursorActividades.close();
+
+        return listaActividades;
     }
 
 

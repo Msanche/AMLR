@@ -1,35 +1,33 @@
 package com.example.amlr;
 
 import androidx.appcompat.app.AppCompatActivity;
-import com.example.amlr.RegistroListener;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 import java.io.InputStream;
 import android.os.Handler;
-
-
 import com.example.amlr.db.DbHelper;
 
-public class abrir_cerradura extends AppCompatActivity implements RegistroListener{
+public class abrir_cerradura extends AppCompatActivity{
 
     private EditText[] editTexts = new EditText[4]; // Array para almacenar los EditText
-    // Variable para la interfaz RegistroListener
-    private RegistroListener registroListener;
     //PARA MANEJO DE BLOQUEOS
     private int failedAttempts = 0;
     private boolean isLocked = false;
@@ -47,8 +45,6 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Inicialización de registroListener
-        registroListener = this;  // Puedes asignar 'this' si la clase implementa la interfaz
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_abrir_cerradura);
 
@@ -264,20 +260,6 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
         }
     }
 
-
-    // Agrega aquí la función para enviar "1" al HC-05 a través de Bluetooth.
-    /*private void enviarUnoPorBluetooth() {
-        if (outputStream != null) {
-            try {
-                outputStream.write("1".getBytes());
-                Toast.makeText(this, "Se envió", Toast.LENGTH_SHORT).show();
-            } catch (IOException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Error al enviar datos por Bluetooth", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }*/
-
     //*******************************************************************************************************************************************************
     private void enviarUnoPorBluetooth(char data) {
         try {
@@ -326,6 +308,31 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
             //**********************************************************************************************************************************************
             enviarUnoPorBluetooth('1'); // Enviar "1" por Bluetooth
             Toast.makeText(this, "Se hizo el enviarUnoPorBluetooth", Toast.LENGTH_SHORT).show();
+            //Insertar en base de datos
+            String actividad = "Se abrió la cerradura";
+            String fechaHora = getCurrentTimeStamp();
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            /*if (db != null) {
+                // Mostrar mensaje si la base de datos se creó correctamente
+                Toast.makeText(Crear_Cuenta.this, "BASE DE DATOS CREADA", Toast.LENGTH_LONG).show();
+            } else {
+                // Mostrar mensaje si hubo un error al crear la base de datos
+                Toast.makeText(Crear_Cuenta.this, "ERROR AL CREAR LA BASE DE DATOS", Toast.LENGTH_LONG).show();
+            }
+             */
+            ContentValues datosActividad = new ContentValues();
+            datosActividad.put("accion", actividad);
+            datosActividad.put("fecha_y_hora", fechaHora);
+            try {
+                // Insertar los datos del usuario en la base de datos
+                dbHelper.getWritableDatabase().insert("t_registro", null, datosActividad);
+                dbHelper.getWritableDatabase().close();
+                // Mostrar mensaje de éxito y redirigir a la actividad principal
+                Toast.makeText(abrir_cerradura.this, "Datos agregados", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                // Manejar posibles excepciones y mostrar un mensaje de error
+                Toast.makeText(abrir_cerradura.this, "Error al insertar datos" + e.toString(), Toast.LENGTH_SHORT).show();
+            }
         } else {
             // Incrementa el contador de intentos fallidos
             failedAttempts++;
@@ -341,9 +348,31 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
     private void bloquearCerradura() {
         isLocked = true;
         Toast.makeText(this, "La cerradura se bloqueará durante 30 segundos", Toast.LENGTH_SHORT).show();
-        // Llama al método de la interfaz para indicar el bloqueo
-        if (registroListener != null) {
-            registroListener.onBloqueoCerradura();
+        //Insertar en base de datos
+        DbHelper dbHelper = new DbHelper(this, "Cerradura.db", null, 6);
+        String actividad = "Se bloqueó la cerradura";
+        String fechaHora = getCurrentTimeStamp();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+            /*if (db != null) {
+                // Mostrar mensaje si la base de datos se creó correctamente
+                Toast.makeText(Crear_Cuenta.this, "BASE DE DATOS CREADA", Toast.LENGTH_LONG).show();
+            } else {
+                // Mostrar mensaje si hubo un error al crear la base de datos
+                Toast.makeText(Crear_Cuenta.this, "ERROR AL CREAR LA BASE DE DATOS", Toast.LENGTH_LONG).show();
+            }
+             */
+        ContentValues datosActividad = new ContentValues();
+        datosActividad.put("accion", actividad);
+        datosActividad.put("fecha_y_hora", fechaHora);
+        try {
+            // Insertar los datos del usuario en la base de datos
+            dbHelper.getWritableDatabase().insert("t_registro", null, datosActividad);
+            dbHelper.getWritableDatabase().close();
+            // Mostrar mensaje de éxito y redirigir a la actividad principal
+            Toast.makeText(abrir_cerradura.this, "Datos agregados", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            // Manejar posibles excepciones y mostrar un mensaje de error
+            Toast.makeText(abrir_cerradura.this, "Error al insertar datos" + e.toString(), Toast.LENGTH_SHORT).show();
         }
         // Inicia un temporizador para desbloquear la cerradura después de 30 segundos
         handler.postDelayed(new Runnable() {
@@ -354,40 +383,17 @@ public class abrir_cerradura extends AppCompatActivity implements RegistroListen
         }, 30000);
     }
 
+
     private void desbloquearCerradura() {
         isLocked = false;
         failedAttempts = 0;
         Toast.makeText(this, "La cerradura se ha desbloqueado", Toast.LENGTH_SHORT).show();
-
-        // Llama al método de la interfaz para indicar la apertura
-        if (registroListener != null) {
-            registroListener.onAperturaCerradura();
-        }
     }
 
-    @Override
-    public void onAperturaCerradura() {
-        // Implementación para cuando se abra la cerradura
-        // Puedes agregar código específico aquí si es necesario
-        notifyRegistroListener(true);
+    // Método para obtener la marca de tiempo actual
+    private String getCurrentTimeStamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault());
+        return sdf.format(new Date());
     }
 
-    @Override
-    public void onBloqueoCerradura() {
-        // Implementación para cuando se bloquee la cerradura
-        // Puedes agregar código específico aquí si es necesario
-        notifyRegistroListener(false);
-    }
-
-    // Método para notificar a la actividad de registro
-    private void notifyRegistroListener(boolean aperturaExitosa) {
-        RegistroListener listener = (RegistroListener) this;
-        if (listener != null) {
-            if (aperturaExitosa) {
-                listener.onAperturaCerradura();
-            } else {
-                listener.onBloqueoCerradura();
-            }
-        }
-    }
 }
